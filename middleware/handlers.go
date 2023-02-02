@@ -56,7 +56,7 @@ func GetAllBooks(w http.ResponseWriter, r *http.Request) {
 		var name string
 		var author string
 		var pages int
-		var publication_date time.Time
+		var publication_date string //time.Time
 
 		err = rows.Scan(&id, &name, &author, &pages, &publication_date)
 
@@ -79,7 +79,13 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 	var book models.Book
 
 	// decode the json request to user
+
 	err := json.NewDecoder(r.Body).Decode(&book)
+	fmt.Println(book, "hi")
+	//publicationDate := book.DOP.Format("2006-01-02")
+
+	dop, err := time.Parse("2006-01-02", book.DOP)
+	fmt.Println(dop)
 	checkErr(err)
 	var bookID int
 	err = db.QueryRow(`INSERT INTO books(name, author, pages, publication_date) VALUES($1, $2, $3, $4) RETURNING id`, book.Name, book.Author, book.Pages, book.DOP).Scan(&bookID)
@@ -105,6 +111,8 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	var book models.Book
 	// decode the json request to book
 	err = json.NewDecoder(r.Body).Decode(&book)
+	//dop, err := time.Parse("2006-01-02 15:04", string(book.DOP))
+	fmt.Printf("hi, I'm update %T", book.DOP)
 	checkErr(err)
 	//var updatedIds int
 	res, err := db.Exec(`UPDATE books set name=$1, author=$2, pages=$3, publication_date=$4 where id=$5 RETURNING id`, book.Name, book.Author, book.Pages, book.DOP, id) //.Scan(&updatedIds)
@@ -178,7 +186,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 	var name string
 	var author string
 	var pages int
-	var publicationDate time.Time
+	var publicationDate string //time.Time
 
 	err = db.QueryRow(`SELECT id, name, author, pages, publication_date FROM books where id = $1`, bookId).Scan(&id, &name, &author, &pages, &publicationDate)
 	if err == nil {

@@ -15,6 +15,8 @@ func main() {
 		AllowedMethods: []string{
 			http.MethodPost,
 			http.MethodGet,
+			http.MethodPut,
+			http.MethodDelete,
 		},
 		AllowedHeaders:   []string{"*"},
 		AllowCredentials: false,
